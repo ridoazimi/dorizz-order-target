@@ -3,7 +3,7 @@ const API="https://dorizzstore.com/api/order-target";
 const $=id=>document.getElementById(id);
 const fmt=n=>new Intl.NumberFormat("id-ID").format(n);
 const date=d=>new Date(d+"T00:00:00+07:00").toLocaleDateString("id-ID",{timeZone:"Asia/Jakarta",day:"numeric",month:"short"});
-let token=null,popup=null,state=null,generation=0,controller=null,lastTotal=null;
+let token=null,popup=null,state=null,generation=0,controller=null,lastTotal=null,currentData=null;
 function connection(text,kind=""){$("connection").textContent=text;$("connection").className=kind;}
 function notice(text){$("notice").textContent=text;$("notice").hidden=!text;}
 function logout(message=""){
@@ -35,7 +35,7 @@ function svgNode(name,attributes={},text){
 function draw(data){
  const today=new Date(new Date(data.generatedAt).getTime()+7*3600000).toISOString().slice(0,10);
  const max=Math.max(98,...data.daily.map(d=>d.orders));
- const width=900,height=215,left=40,top=12,chartHeight=165,step=(width-left-10)/30;
+ const width=Math.max(260,$("chart").clientWidth),height=215,left=40,top=12,chartHeight=165,step=(width-left-10)/30;
  const svg=svgNode("svg",{viewBox:`0 0 ${width} ${height}`,role:"img","aria-label":`Order harian periode 29 September sampai 28 Oktober. Total ${data.total} order.`});
  const y=n=>top+chartHeight-n/max*chartHeight;
  svg.append(svgNode("line",{x1:left,y1:y(98),x2:width-8,y2:y(98),stroke:"#9fa7a9","stroke-dasharray":"4 5"}));
@@ -44,7 +44,7 @@ function draw(data){
  data.daily.forEach((d,i)=>{
   const future=d.date>today;const x=left+i*step+4;
   if(!future){
-   const bar=svgNode("rect",{x,y:y(d.orders),width:step-8,height:Math.max(0,chartHeight*d.orders/max),fill:d.date===today?"#b63b21":"#525c62",rx:1});
+   const bar=svgNode("rect",{x,y:y(d.orders),width:step-Math.max(2,step*.25),height:Math.max(0,chartHeight*d.orders/max),fill:d.date===today?"#b63b21":"#525c62",rx:1});
    bar.append(svgNode("title",{},`${date(d.date)}: ${fmt(d.orders)} order`));svg.append(bar);
   }
   if([0,6,12,18,24,29].includes(i))svg.append(svgNode("text",{x:x+(step-Math.max(2,step*.25))/2,y:203,"text-anchor":i===29?"end":"middle",fill:"#5c6367","font-size":12},date(d.date)));

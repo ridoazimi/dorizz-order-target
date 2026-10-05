@@ -7,7 +7,7 @@ let token=null,popup=null,state=null,generation=0,controller=null,lastTotal=null
 function connection(text,kind=""){$("connection").textContent=text;$("connection").className=kind;}
 function notice(text){$("notice").textContent=text;$("notice").hidden=!text;}
 function logout(message=""){
- token=null;generation++;controller?.abort();popup?.close();popup=null;state=null;lastTotal=null;
+ token=null;currentData=null;generation++;controller?.abort();popup?.close();popup=null;state=null;lastTotal=null;
  $("dashboard").hidden=true;$("logout").hidden=true;$("gate").hidden=false;
  for(const id of ["total","today","days","needed","percentage"])$(id).textContent="…";
  $("chart").replaceChildren();$("daily-list").replaceChildren();
@@ -47,7 +47,7 @@ function draw(data){
    const bar=svgNode("rect",{x,y:y(d.orders),width:step-8,height:Math.max(0,chartHeight*d.orders/max),fill:d.date===today?"#b63b21":"#525c62",rx:1});
    bar.append(svgNode("title",{},`${date(d.date)}: ${fmt(d.orders)} order`));svg.append(bar);
   }
-  if([0,6,12,18,24,29].includes(i))svg.append(svgNode("text",{x:x+(step-8)/2,y:203,"text-anchor":"middle",fill:"#5c6367","font-size":12},date(d.date)));
+  if([0,6,12,18,24,29].includes(i))svg.append(svgNode("text",{x:x+(step-Math.max(2,step*.25))/2,y:203,"text-anchor":i===29?"end":"middle",fill:"#5c6367","font-size":12},date(d.date)));
  });
  $("chart").replaceChildren(svg);$("daily-list").replaceChildren();
  data.daily.forEach(d=>{
@@ -58,6 +58,7 @@ function draw(data){
  });
 }
 function render(data){
+ currentData=data;
  if(!Number.isInteger(data.total)||!Array.isArray(data.daily)||data.daily.length!==30)throw new Error("Data tidak valid");
  $("total").textContent=fmt(data.total);
  if(lastTotal!==null&&lastTotal!==data.total){$("total").classList.remove("changed");void $("total").offsetWidth;$("total").classList.add("changed");}
@@ -108,3 +109,5 @@ async function listen(current){
 }
 window.addEventListener("pagehide",()=>{generation++;controller?.abort();token=null;});
 window.addEventListener("pageshow",event=>{if(event.persisted)logout();});
+
+new ResizeObserver(()=>{if(currentData)draw(currentData)}).observe($("chart"));

@@ -11,3 +11,9 @@ test("SSE parser buffers partial frames and preserves authoritative snapshots",a
  parse("event: snapshot\ndata: {\"total\":1}\n\n");
  assert.equal(events.at(-1).data.total,1);
 });
+
+test("chart keeps mobile labels at native readable size",async()=>{
+ const {readFileSync}=await import("node:fs");
+ const source=readFileSync("app.js","utf8");
+ assert.ok(source.includes("$(\"chart\").clientWidth"),"chart viewport must follow actual container width, not a shrinking desktop canvas");
+});

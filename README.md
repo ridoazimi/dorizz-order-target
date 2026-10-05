@@ -1,8 +1,33 @@
-# Dorizz Order Target
-Static GitHub Pages frontend. All metrics require an active Dorizz Store admin with transaction-view permission. No production data, admin credentials, or tokens are published here.
+# Dorizz Store — Target Order
 
-Period: 29 September 2026 00:00 WIB through 28 October 2026 23:59:59 WIB. Target: 2940 successful transaction records, dated by purchaseDate.
+Papan angka order berhasil untuk periode 29 September – 28 Oktober 2026 (WIB),
+dengan target 2.940 order.
 
-Login opens a Dorizz Store window and grants a scoped read-only token held only in memory for this tab. Reloading requires reconnecting the store session. Data uses authenticated fetch streaming (SSE), driven by committed database transaction notifications. No scheduled count polling. Reconnection always receives a fresh authoritative snapshot, so duplicated events do not increment the total twice.
+- **Realtime.** Angka diperbarui saat transaksi berstatus `success` selesai
+  tersimpan di Dorizz Store. Tidak ada polling berjangka.
+- **Hitung dari awal.** Setiap kali halaman dibuka atau dimuat ulang, angka
+  berjalan cepat dari 0 sampai jumlah sebenarnya, lalu digit yang berubah
+  berputar singkat setiap ada order baru.
+- **Login password saja.** Password diverifikasi di `dorizzstore.com`, bukan di
+  GitHub Pages. Halaman ini hanya menerima token baca berumur 8 jam.
 
-Deploy main at repository root. Local tests: npm test. Browser security intentionally allows only the production API origin; serve at the published GitHub Pages URL for login E2E testing.
+## Berkas
+
+| Berkas | Isi |
+| --- | --- |
+| `index.html` | Struktur halaman: gerbang password dan papan angka |
+| `style.css` | Gaya minimal, satu kolom, aman untuk layar 360px |
+| `app.js` | Login, aliran realtime, dan penggambaran angka |
+| `count.js` | Logika animasi hitung (teruji) |
+| `stream.js` | Pembaca aliran Server-Sent Events (teruji) |
+
+## Uji
+
+```bash
+npm test
+```
+
+## Sumber data
+
+`https://dorizzstore.com/api/order-target/login` dan `/stream`. Keduanya hanya
+mengizinkan origin `https://ridoazimi.github.io`.

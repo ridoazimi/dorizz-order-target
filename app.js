@@ -16,16 +16,17 @@ function connection(text, cls) {
   el.className = cls || "";
 }
 
-/** Render angka per-digit, hanya digit yang berubah yang diberi animasi. */
+/** Render angka per-digit; hanya digit yang berubah yang bergulir. */
 function paint(value) {
-  const digits = changedDigits(fmt(shown), fmt(value));
   const el = $("total");
   el.replaceChildren(
-    ...digits.map(({ char, spin }) => {
-      const span = document.createElement("span");
-      span.className = spin ? "d spin" : "d";
-      span.textContent = char;
-      return span;
+    ...changedDigits(fmt(shown), fmt(value)).map(({ char, spin }) => {
+      const cell = document.createElement("span");
+      cell.className = spin ? "d spin" : "d";
+      const inner = document.createElement("span");
+      inner.textContent = char;
+      cell.appendChild(inner);
+      return cell;
     }),
   );
   shown = value;
@@ -50,6 +51,8 @@ function render(data) {
   $("target").textContent = fmt(data.target);
   $("progress").textContent = `${progress.toFixed(1).replace(".", ",")}%`;
   $("fill").style.width = `${progress}%`;
+  $("today").textContent = fmt(data.today);
+  $("remaining").textContent = fmt(data.remaining);
   countTo(data.total);
 }
 
@@ -64,6 +67,8 @@ function reset() {
   $("total").textContent = "0";
   $("progress").textContent = "0%";
   $("fill").style.width = "0";
+  $("today").textContent = "0";
+  $("remaining").textContent = "0";
   $("password").value = "";
   $("password").focus();
 }
@@ -72,7 +77,18 @@ async function stream() {
   controller?.abort();
   controller = new AbortController();
   const parser = createParser((event) => {
-    if (event.type !== "snapshot") return;
+    // createParser memancarkan {event, data}; membaca .type membuat snapshot terbuang.
+    if (event.event === "heartbeat") {
+      retry = 0;
+      connection("Realtime", "live");
+      return;
+    }
+    if (event.event === "expired") return reset();
+    if (event.event === "unavailable") {
+      connection("Data tidak tersedia", "stale");
+      return;
+    }
+    if (event.event !== "snapshot") return;
     retry = 0;
     connection("Realtime", "live");
     render(event.data);

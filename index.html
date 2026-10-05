@@ -5,31 +5,53 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light">
 <meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#ee4d2d">
 <title>Target Order | Dorizz Store</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<main id="app">
-  <form id="gate" autocomplete="off">
+
+<form id="gate" autocomplete="off">
+  <div class="gate-brand">Dorizz Store</div>
+  <div class="gate-card">
     <h1>Target Order</h1>
     <label for="password">Password</label>
-    <input id="password" name="password" type="password" autocomplete="current-password" inputmode="text" required>
-    <button type="submit">Masuk</button>
+    <input id="password" name="password" type="password" autocomplete="current-password" required>
+    <button type="submit">MASUK</button>
     <p id="gate-status" role="alert" aria-live="assertive"></p>
-  </form>
+  </div>
+</form>
 
-  <section id="board" hidden>
-    <header>
-      <span id="connection" role="status" aria-live="polite">Menghubungkan</span>
-      <button id="logout" type="button">Keluar</button>
-    </header>
-    <p class="caption">Order berhasil</p>
-    <p id="total" class="total" aria-live="polite" aria-atomic="true">0</p>
-    <div class="bar"><span id="fill"></span></div>
-    <p class="meta"><span id="progress">0%</span> dari <span id="target">2.940</span></p>
-    <p class="period">29 Sep – 28 Okt 2026 · WIB</p>
-  </section>
-</main>
+<div id="board" hidden>
+  <header class="topbar">
+    <span class="topbar-title">Target Order</span>
+    <span id="connection" role="status" aria-live="polite">Menghubungkan</span>
+    <button id="logout" type="button" aria-label="Keluar">Keluar</button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="hero-label">Order Berhasil</p>
+      <p id="total" class="hero-total" aria-live="polite" aria-atomic="true">0</p>
+      <div class="hero-bar"><span id="fill"></span></div>
+      <p class="hero-meta"><b id="progress">0%</b> dari target <span id="target">2.940</span></p>
+    </section>
+
+    <section class="stats">
+      <div class="stat">
+        <span class="stat-label">Hari Ini</span>
+        <b id="today" class="stat-value">0</b>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Sisa Target</span>
+        <b id="remaining" class="stat-value">0</b>
+      </div>
+    </section>
+
+    <p class="period">29 Sep &ndash; 28 Okt 2026 &middot; WIB</p>
+  </main>
+</div>
+
 <script type="module" src="app.js"></script>
 </body>
 </html>

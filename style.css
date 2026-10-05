@@ -1,111 +1,223 @@
+/* Sistem visual mengikuti Shopee: aksen #EE4D2D, radius kecil 2-4px,
+   latar halaman #F5F5F5, kartu putih bergaris tipis, Helvetica Neue. */
 :root {
-  --ink: #1f2324;
-  --muted: #6a7174;
-  --line: #e3e5e4;
   --brand: #ee4d2d;
-  --bg: #ffffff;
+  --brand-dark: #d73211;
+  --ink: #222222;
+  --muted: rgba(0, 0, 0, 0.54);
+  --line: rgba(0, 0, 0, 0.09);
+  --page: #f5f5f5;
+  --card: #ffffff;
+  --danger: #d0011b;
+  --ok: #00bfa5;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; }
+html, body { margin: 0; }
 body {
-  background: var(--bg);
+  background: var(--page);
   color: var(--ink);
-  font: 16px/1.5 -apple-system, "Segoe UI", Roboto, system-ui, sans-serif;
+  font: 400 14px/1.5 "Helvetica Neue", Helvetica, Arial, Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
-#app {
-  min-height: 100%;
-  max-width: 420px;
-  margin: 0 auto;
-  padding: 32px 24px 48px;
+:focus-visible { outline: 2px solid #15658b; outline-offset: 2px; }
+
+/* ---------- Gerbang password ---------- */
+#gate {
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
+  gap: 20px;
+  padding: 24px;
+  background: linear-gradient(-180deg, #f53d2d, #ff6633);
 }
-
-/* Gerbang password */
-#gate h1 { font-size: 22px; margin: 0 0 28px; letter-spacing: -0.01em; }
-label { display: block; font-size: 14px; color: var(--muted); margin-bottom: 8px; }
-input, button {
-  font: inherit;
+.gate-brand {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.gate-card {
   width: 100%;
-  min-height: 48px;
+  max-width: 360px;
+  background: var(--card);
   border-radius: 4px;
+  box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.14);
+  padding: 24px 22px 22px;
+}
+.gate-card h1 {
+  margin: 0 0 20px;
+  font-size: 18px;
+  font-weight: 500;
+}
+label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
 }
 input {
-  border: 1px solid #c9cdcd;
-  padding: 0 14px;
-  background: #fff;
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  font: inherit;
   color: var(--ink);
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  border-radius: 2px;
 }
-input:focus-visible, button:focus-visible { outline: 2px solid #15658b; outline-offset: 2px; }
+input:focus { border-color: rgba(0, 0, 0, 0.26); }
 #gate button {
-  margin-top: 16px;
-  border: 0;
-  background: var(--brand);
+  width: 100%;
+  height: 40px;
+  margin-top: 18px;
+  font: 500 14px/1 inherit;
+  letter-spacing: 0.02em;
   color: #fff;
-  font-weight: 600;
+  background: var(--brand);
+  border: 0;
+  border-radius: 2px;
   cursor: pointer;
 }
-#gate button[disabled] { opacity: 0.55; cursor: wait; }
-#gate-status { min-height: 22px; margin: 14px 0 0; font-size: 14px; color: #b3261e; }
+#gate button:hover { background: var(--brand-dark); }
+#gate button[disabled] { opacity: 0.7; cursor: progress; }
+#gate-status {
+  min-height: 20px;
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--danger);
+}
 
-/* Papan angka */
-#board header {
+/* ---------- Papan angka ---------- */
+.topbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
-  margin-bottom: 40px;
+  height: 48px;
+  padding: 0 16px;
+  background: linear-gradient(-180deg, #f53d2d, #ff6633);
+  color: #fff;
 }
-#connection { font-size: 13px; color: var(--muted); }
-#connection.live { color: #1a7f45; }
-#connection.stale { color: #9a6700; }
-#logout {
-  width: auto;
-  min-height: 32px;
-  padding: 0 12px;
-  border: 1px solid var(--line);
-  border-radius: 4px;
+.topbar-title { font-size: 16px; font-weight: 500; margin-right: auto; }
+#connection {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.92);
+}
+#connection::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+}
+#connection.live::before {
   background: #fff;
-  color: var(--muted);
-  font-size: 13px;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+#connection.stale::before { background: #ffe066; }
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+#logout {
+  height: 26px;
+  padding: 0 10px;
+  font: 400 12px/1 inherit;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 2px;
   cursor: pointer;
 }
-.caption { margin: 0 0 6px; font-size: 14px; color: var(--muted); }
-.total {
+#logout:hover { background: rgba(255, 255, 255, 0.26); }
+
+main { max-width: 480px; margin: 0 auto; padding: 12px 12px 32px; }
+
+.hero {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
+  padding: 22px 18px 20px;
+  text-align: center;
+}
+.hero-label {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.hero-total {
   margin: 0;
-  font-size: clamp(56px, 20vw, 84px);
+  display: flex;
+  justify-content: center;
+  font-size: clamp(52px, 17vw, 76px);
   font-weight: 700;
   line-height: 1.05;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
+  color: var(--brand);
   font-variant-numeric: tabular-nums;
-  display: flex;
-  gap: 1px;
 }
-.total .d { display: inline-block; }
-.total .spin { animation: spin 420ms cubic-bezier(0.22, 1, 0.36, 1); }
-@keyframes spin {
-  0%   { transform: translateY(0.5em); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+/* Setiap digit punya jendela sendiri supaya hanya digit yang berubah bergulir. */
+.hero-total .d {
+  display: inline-block;
+  overflow: hidden;
+  height: 1.05em;
 }
-@media (prefers-reduced-motion: reduce) {
-  .total .spin { animation: none; }
+.hero-total .d > span { display: block; }
+.hero-total .spin > span { animation: roll 380ms cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes roll {
+  from { transform: translateY(100%); opacity: 0.2; }
+  to   { transform: translateY(0); opacity: 1; }
 }
-.bar {
-  margin: 28px 0 10px;
-  height: 6px;
-  border-radius: 3px;
-  background: #f0f1f1;
+.hero-bar {
+  margin: 18px 0 10px;
+  height: 8px;
+  background: #f5f5f5;
+  border-radius: 999px;
   overflow: hidden;
 }
-.bar span {
+.hero-bar span {
   display: block;
-  height: 100%;
   width: 0;
-  background: var(--brand);
-  transition: width 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff6633, var(--brand));
+  transition: width 520ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-.meta { margin: 0; font-size: 15px; color: var(--muted); font-variant-numeric: tabular-nums; }
-.meta #progress { color: var(--ink); font-weight: 600; }
-.period { margin: 22px 0 0; font-size: 13px; color: var(--muted); }
+.hero-meta { margin: 0; font-size: 13px; color: var(--muted); }
+.hero-meta b { color: var(--ink); font-weight: 700; }
+
+.stats { display: flex; gap: 8px; margin-top: 8px; }
+.stat {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
+  padding: 12px 14px;
+}
+.stat-label { display: block; font-size: 12px; color: var(--muted); }
+.stat-value {
+  display: block;
+  margin-top: 4px;
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.period {
+  margin: 14px 0 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-total .spin > span { animation: none; }
+  #connection.live::before { animation: none; }
+  .hero-bar span { transition: none; }
+}

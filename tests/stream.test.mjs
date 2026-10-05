@@ -30,3 +30,12 @@ test("browser offline event aborts the active streaming request", () => {
   const app = readFileSync("app.js", "utf8");
   assert.match(app, /addEventListener\("offline"/);
 });
+
+test("only the newest reconnect attempt is allowed to drive the UI", () => {
+  const app = readFileSync("app.js", "utf8");
+  // Retry otomatis dan event "online" pernah saling membatalkan koneksi.
+  assert.match(app, /const mine = \+\+generation/);
+  assert.match(app, /if \(mine !== generation\) return/);
+  assert.match(app, /if \(mine === generation && token\) stream\(\)/);
+  assert.ok(!/signal: controller\.signal/.test(app), "stream harus memakai controller miliknya sendiri");
+});

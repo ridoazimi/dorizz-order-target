@@ -9,6 +9,7 @@ let token = null;
 let controller = null;
 let shown = 0;
 let retry = 0;
+let generation = 0;
 
 function connection(text, cls) {
   const el = $("connection");
@@ -57,6 +58,7 @@ function render(data) {
 }
 
 function reset() {
+  generation += 1;
   controller?.abort();
   controller = null;
   token = null;
@@ -74,10 +76,16 @@ function reset() {
 }
 
 async function stream() {
+  // Retry otomatis dan event "online" sama-sama memanggil stream(). Tanpa
+  // penanda generasi, panggilan kedua membatalkan koneksi milik panggilan
+  // pertama dan aliran bisa mati diam tanpa ada yang menyambung ulang.
+  const mine = ++generation;
   controller?.abort();
-  controller = new AbortController();
+  const own = new AbortController();
+  controller = own;
+
   const parser = createParser((event) => {
-    // createParser memancarkan {event, data}; membaca .type membuat snapshot terbuang.
+    if (mine !== generation) return;
     if (event.event === "heartbeat") {
       retry = 0;
       connection("Realtime", "live");
@@ -97,9 +105,10 @@ async function stream() {
   try {
     const response = await fetch(`${API}/stream`, {
       headers: { Authorization: `Bearer ${token}` },
-      signal: controller.signal,
+      signal: own.signal,
       cache: "no-store",
     });
+    if (mine !== generation) return;
     if (response.status === 401) return reset();
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
@@ -107,15 +116,18 @@ async function stream() {
     const decoder = new TextDecoder();
     for (;;) {
       const { value, done } = await reader.read();
+      if (mine !== generation) return;
       if (done) break;
       parser(decoder.decode(value, { stream: true }));
     }
     throw new Error("Stream berakhir");
   } catch (error) {
-    if (controller?.signal.aborted) return;
+    if (own.signal.aborted || mine !== generation || !token) return;
     connection("Menyambung ulang", "stale");
     retry = Math.min(retry + 1, 5);
-    setTimeout(stream, 500 * 2 ** (retry - 1));
+    setTimeout(() => {
+      if (mine === generation && token) stream();
+    }, 500 * 2 ** (retry - 1));
   }
 }
 
@@ -156,6 +168,7 @@ $("logout").addEventListener("click", reset);
 
 window.addEventListener("offline", () => {
   if (!token) return;
+  generation += 1;
   controller?.abort();
   connection("Terputus", "stale");
 });

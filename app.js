@@ -12,6 +12,10 @@ function logout(message=""){
  $("dashboard").hidden=true;$("logout").hidden=true;$("gate").hidden=false;
  for(const id of ["total","today","days","needed","percentage"])$(id).textContent="…";
  $("chart").replaceChildren();$("daily-list").replaceChildren();
+ $("remaining").textContent="Menunggu data";$("updated").textContent="Menunggu data server";
+ $("progress-fill").style.width="0%";$("progress").setAttribute("aria-valuenow","0");
+ $("progress").removeAttribute("aria-valuetext");notice("");
+
  $("login-status").textContent=message;connection("Belum terhubung");
 }
 $("logout").addEventListener("click",()=>logout());

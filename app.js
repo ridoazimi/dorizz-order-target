@@ -112,3 +112,9 @@ window.addEventListener("pagehide",()=>{generation++;controller?.abort();token=n
 window.addEventListener("pageshow",event=>{if(event.persisted)logout();});
 
 new ResizeObserver(()=>{if(currentData)draw(currentData)}).observe($("chart"));
+
+window.addEventListener("offline",()=>{
+ if(!token)return;
+ controller?.abort();connection("Terputus","stale");
+ notice("Koneksi terputus. Angka terakhir belum diperbarui; menyambungkan kembali secara otomatis.");
+});

@@ -24,3 +24,8 @@ test("mobile chart uses four spaced date labels",async()=>{
  assert.deepEqual(chartLabelIndices(300),[0,10,20,29]);
  assert.deepEqual(chartLabelIndices(1000),[0,6,12,18,24,29]);
 });
+
+test("browser offline event aborts the active streaming request",async()=>{
+ const {readFileSync}=await import("node:fs");const s=readFileSync("app.js","utf8");
+ assert.match(s,/addEventListener\("offline"/);
+});

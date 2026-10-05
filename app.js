@@ -1,3 +1,4 @@
+import {chartLabelIndices} from "./chart.js";
 import {createParser} from "./stream.js";
 const API="https://dorizzstore.com/api/order-target";
 const $=id=>document.getElementById(id);
@@ -47,7 +48,7 @@ function draw(data){
    const bar=svgNode("rect",{x,y:y(d.orders),width:step-Math.max(2,step*.25),height:Math.max(0,chartHeight*d.orders/max),fill:d.date===today?"#b63b21":"#525c62",rx:1});
    bar.append(svgNode("title",{},`${date(d.date)}: ${fmt(d.orders)} order`));svg.append(bar);
   }
-  if([0,6,12,18,24,29].includes(i))svg.append(svgNode("text",{x:x+(step-Math.max(2,step*.25))/2,y:203,"text-anchor":i===29?"end":"middle",fill:"#5c6367","font-size":12},date(d.date)));
+  if(chartLabelIndices(width).includes(i))svg.append(svgNode("text",{x:x+(step-Math.max(2,step*.25))/2,y:203,"text-anchor":i===29?"end":"middle",fill:"#5c6367","font-size":12},date(d.date)));
  });
  $("chart").replaceChildren(svg);$("daily-list").replaceChildren();
  data.daily.forEach(d=>{

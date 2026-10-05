@@ -17,3 +17,10 @@ test("chart keeps mobile labels at native readable size",async()=>{
  const source=readFileSync("app.js","utf8");
  assert.ok(source.includes("$(\"chart\").clientWidth"),"chart viewport must follow actual container width, not a shrinking desktop canvas");
 });
+
+test("mobile chart uses four spaced date labels",async()=>{
+ assert.ok(existsSync("chart.js"),"responsive chart label selection must exist");
+ const {chartLabelIndices}=await import("../chart.js");
+ assert.deepEqual(chartLabelIndices(300),[0,10,20,29]);
+ assert.deepEqual(chartLabelIndices(1000),[0,6,12,18,24,29]);
+});

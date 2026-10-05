@@ -20,6 +20,9 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 :focus-visible { outline: 2px solid #15658b; outline-offset: 2px; }
+/* display:flex pada #gate menimpa atribut hidden, sehingga layar login tetap
+   menutupi papan angka setelah masuk. Aturan ini harus menang. */
+[hidden] { display: none !important; }
 
 /* ---------- Gerbang password ---------- */
 #gate {

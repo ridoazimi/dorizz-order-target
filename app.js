@@ -4,6 +4,7 @@ import { countValue, countDuration, changedDigits } from "./count.js";
 const API = "https://dorizzstore.com/api/order-target";
 const $ = (id) => document.getElementById(id);
 const fmt = (n) => n.toLocaleString("id-ID");
+const pct = (n) => `${n.toFixed(1).replace(".", ",")}%`;
 
 let token = null;
 let controller = null;
@@ -47,13 +48,44 @@ function countTo(target) {
   requestAnimationFrame(step);
 }
 
+/** Daftar sumber order. Barisnya tetap, hanya angka dan lebar bar berubah. */
+function paintFunnels(funnels) {
+  const list = $("funnel-list");
+  if (!Array.isArray(funnels)) return;
+  // Baris dibuat sekali lalu dipakai ulang supaya transisi lebar bar berjalan
+  // dan pembaca layar tidak mengumumkan seluruh daftar setiap snapshot.
+  if (list.childElementCount !== funnels.length) {
+    list.replaceChildren(
+      ...funnels.map(() => {
+        const row = document.createElement("li");
+        row.className = "funnel-row";
+        row.innerHTML =
+          '<span class="funnel-label"></span>' +
+          '<span class="funnel-orders"></span>' +
+          '<span class="funnel-track"><span class="funnel-fill"></span></span>' +
+          '<span class="funnel-share"></span>';
+        return row;
+      }),
+    );
+  }
+  funnels.forEach((funnel, index) => {
+    const row = list.children[index];
+    row.dataset.key = funnel.key;
+    row.querySelector(".funnel-label").textContent = funnel.label;
+    row.querySelector(".funnel-orders").textContent = fmt(funnel.orders);
+    row.querySelector(".funnel-share").textContent = pct(funnel.share);
+    row.querySelector(".funnel-fill").style.width = `${Math.min(100, funnel.share)}%`;
+  });
+}
+
 function render(data) {
   const progress = Math.min(100, data.progress);
   $("target").textContent = fmt(data.target);
-  $("progress").textContent = `${progress.toFixed(1).replace(".", ",")}%`;
+  $("progress").textContent = pct(progress);
   $("fill").style.width = `${progress}%`;
   $("today").textContent = fmt(data.today);
   $("remaining").textContent = fmt(data.remaining);
+  paintFunnels(data.funnels);
   countTo(data.total);
 }
 
@@ -71,6 +103,7 @@ function reset() {
   $("fill").style.width = "0";
   $("today").textContent = "0";
   $("remaining").textContent = "0";
+  $("funnel-list").replaceChildren();
   $("password").value = "";
   $("password").focus();
 }
